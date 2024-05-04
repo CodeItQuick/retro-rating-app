@@ -1,12 +1,18 @@
-import {createRequire} from 'module';
 
-const require = createRequire(import.meta.url);
-const cors = require('cors');
-const express = require('express')
+import express, { Router } from "express";
+import serverless from "serverless-http";
+import cors from "cors";
+
 const app = express()
+const router = Router();
 
-app.use(cors());
+router.get("/hello", (req, res) => res.send("Hello World!"));
 
+const corsOptions = {
+    origin: ["https://retro-rating-app.netlify.app/"],
+    optionsSuccessStatus: 200 // For legacy browser support
+}
+app.use(cors(corsOptions))
 // copy pasta below
 app.locals.score = {serverThumbsUp: 0, serverThumbsDown: 0};
 app.locals.currentVoters = new Set();
@@ -15,7 +21,7 @@ app.locals.currentHost = [];
 app.locals.sessions = { }
 
 // respond with "hello world" when a GET request is made to the homepage
-app.get('/api/participant', (req, res) => {
+router.get('/api/participant', (req, res) => {
     // start
     if (!app?.locals?.sessions?.[req.query?.session]) {
         app.locals.sessions = {
@@ -46,7 +52,7 @@ app.get('/api/participant', (req, res) => {
     console.log('session', currentSession)
     res.send(currentSession.score)
 })
-app.get('/api/admin', (req, res) => {
+router.get('/api/admin', (req, res) => {
     // start
     if (!app?.locals?.sessions?.[req.query?.session]) {
         app.locals.sessions = {
@@ -72,4 +78,5 @@ app.get('/api/admin', (req, res) => {
 
     res.send(req.query.reset)
 })
-app.listen(8000);
+app.use("/app/", router);
+export const handler = serverless(app);
