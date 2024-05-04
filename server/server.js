@@ -5,11 +5,13 @@ const cors = require('cors');
 const express = require('express')
 const app = express()
 
+app.use(cors());
+
+// copy pasta below
 app.locals.score = {serverThumbsUp: 0, serverThumbsDown: 0};
 app.locals.currentVoters = new Set();
 app.locals.currentHost = [];
 
-app.use(cors());
 // respond with "hello world" when a GET request is made to the homepage
 app.get('/participant', (req, res) => {
     if (app.locals.currentHost.length !== 1) {

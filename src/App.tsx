@@ -17,7 +17,7 @@ function App() {
     const [guid] = useState(uuidv4());
 
     useEffect(() => {
-        fetch(`http://localhost:8000/participant/?thumbsUp=${thumbsUp}&thumbsDown=${thumbsDown}&user=${guid}`,
+        fetch(`/api/participant/?thumbsUp=${thumbsUp}&thumbsDown=${thumbsDown}&user=${guid}`,
             {method: "GET"}).then(x => x.json())
             .then(({serverThumbsUp, serverThumbsDown}) => {
                 console.log(serverThumbsUp)
@@ -28,7 +28,7 @@ function App() {
 
     const onClickHandler = () => {
 
-        fetch(`http://localhost:8000/participant/?thumbsUp=${0}&thumbsDown=${0}&user=${guid}`,
+        fetch(`/api/participant/?thumbsUp=${0}&thumbsDown=${0}&user=${guid}`,
             {method: "GET"}).then(x => x.json())
             .then(({serverThumbsUp, serverThumbsDown}) => {
                 console.log(serverThumbsUp)
@@ -38,13 +38,13 @@ function App() {
     }
     const onAdminStartClickHandler = async () => {
 
-        fetch(`http://localhost:8000/admin/?user=${guid}`,
+        fetch(`/api/admin/?user=${guid}`,
             {method: "GET"}).then(x => x.text())
             .then(console.log)
     }
     const onAdminResetClickHandler = () => {
 
-        fetch(`http://localhost:8000/admin/?user=${guid}&reset=true`,
+        fetch(`/api/admin/?user=${guid}&reset=true`,
             {method: "GET"}).then(x => x.text())
             .then(() => onClickHandler())
     }
