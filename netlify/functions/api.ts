@@ -1,17 +1,16 @@
 
 import express, { Router } from "express";
 import serverless from "serverless-http";
-import cors from "cors";
 
 const app = express();
 const router = Router();
 router.get("/hello", (req, res) => res.send("Hello World!"));
 
-const corsOptions = {
-    origin: ["https://retro-rating-app.netlify.app/"],
-    optionsSuccessStatus: 200 // For legacy browser support
-}
-app.use(cors(corsOptions))
+// const corsOptions = {
+//     origin: ["https://retro-rating-app.netlify.app/"],
+//     optionsSuccessStatus: 200 // For legacy browser support
+// }
+// app.use(cors(corsOptions))
 
 // copy pasta below
 app.locals.score = {serverThumbsUp: 0, serverThumbsDown: 0};
