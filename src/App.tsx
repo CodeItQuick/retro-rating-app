@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -14,7 +14,7 @@ function App() {
     const [thumbsUp, setThumbsUp] = useState(0);
     const [overallThumbsDown, setOverallThumbsDown] = useState(0);
     const [overallThumbsUp, setOverallThumbsUp] = useState(0);
-    const [guid, setGuid] = useState(uuidv4());
+    const [guid] = useState(uuidv4());
 
     useEffect(() => {
         fetch(`http://localhost:8000/participant/?thumbsUp=${thumbsUp}&thumbsDown=${thumbsDown}&user=${guid}`,
