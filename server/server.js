@@ -12,29 +12,29 @@ app.locals.score = {serverThumbsUp: 0, serverThumbsDown: 0};
 app.locals.currentVoters = new Set();
 app.locals.currentHost = [];
 
+app.locals.sessions = { }
+
 // respond with "hello world" when a GET request is made to the homepage
-app.get('/participant', (req, res) => {
-    if (app.locals.currentHost.length !== 1) {
-        console.log("score", app.locals.score)
-        console.log("currentVoters", app.locals.currentVoters)
-        console.log("app.locals.currentHost", app.locals.currentHost)
-        console.log("thumbs up", +req.query?.thumbsUp)
-        console.log("thumbs down", +req.query?.thumbsDown)
-        console.log("user", req.query?.user)
-        return res.send(app.locals.score);
+app.get('/api/participant', (req, res) => {
+    // start
+    if (!app?.locals?.sessions?.[req.query?.session]) {
+        app.locals.sessions = {
+            ...app.locals.sessions,
+            [req.query?.session ]: { score: { serverThumbsDown: 0, serverThumbsUp: 0}, currentVoters: new Set(), currentHost: [req.query?.user] } };
     }
-    if (+req.query.thumbsUp === 1 && !app.locals.currentVoters.has(req.query?.user)) {
-        app.locals.score.serverThumbsUp++;
-        app.locals.currentVoters.add(req.query?.user)
-    } else if (+req.query.thumbsDown === 1 && !app.locals.currentVoters.has(req.query?.user)) {
-        app.locals.score.serverThumbsDown++;
-        app.locals.currentVoters.add(req.query?.user)
-    } else if (+req.query.thumbsUp === 1 && app.locals.currentVoters.has(req.query?.user)) {
-        app.locals.score.serverThumbsUp++;
-        app.locals.score.serverThumbsDown--;
-    } else if (+req.query.thumbsDown === 1 && app.locals.currentVoters.has(req.query?.user)) {
-        app.locals.score.serverThumbsDown++;
-        app.locals.score.serverThumbsUp--;
+    const currentSession = app?.locals?.sessions[req.query?.session];
+    if (+req.query.thumbsUp === 1 && !currentSession?.currentVoters.has(req.query?.user)) {
+        currentSession.score.serverThumbsUp++;
+        currentSession.currentVoters.add(req.query?.user)
+    } else if (+req.query.thumbsDown === 1 && !currentSession?.currentVoters.has(req.query?.user)) {
+        currentSession.score.serverThumbsDown++;
+        currentSession.currentVoters.add(req.query?.user)
+    } else if (+req.query.thumbsUp === 1 && currentSession?.currentVoters.has(req.query?.user)) {
+        currentSession.score.serverThumbsUp++;
+        currentSession.score.serverThumbsDown--;
+    } else if (+req.query.thumbsDown === 1 && currentSession?.currentVoters.has(req.query?.user)) {
+        currentSession.score.serverThumbsDown++;
+        currentSession.score.serverThumbsUp--;
     }
     console.log("app.locals.score", app.locals.score)
     console.log("app.locals.currentVoters", app.locals.currentVoters)
@@ -42,21 +42,33 @@ app.get('/participant', (req, res) => {
     console.log("thumbs up", +req.query?.thumbsUp)
     console.log("thumbs down", +req.query?.thumbsDown)
     console.log("user", req.query?.user)
-    res.send(app.locals.score)
+    console.log('session', req.query.session)
+    console.log('session', currentSession)
+    res.send(currentSession.score)
 })
-app.get('/admin', (req, res) => {
-    if (app.locals.currentHost.length === 0 && !req.query?.reset) {
-        app.locals.currentHost = [req.query?.user]
-        // bug happened
-    } else if (app.locals.currentHost.length > 1) {
-        app.locals.currentHost = [];
+app.get('/api/admin', (req, res) => {
+    // start
+    if (!app?.locals?.sessions?.[req.query?.session]) {
+        app.locals.sessions = {
+            ...app.locals.sessions,
+            [req.query?.session]: { score: { serverThumbsDown: 0, serverThumbsUp: 0}, currentVoters: new Set(), currentHost: [req.query?.user] } };
     }
-    if (app.locals.currentHost?.[0] === req.query?.user && req.query?.reset === "true") {
-        app.locals.currentHost = [];
-        app.locals.currentVoters = new Set();
-        app.locals.score.serverThumbsDown = 0;
-        app.locals.score.serverThumbsUp = 0;
+    const currentSession = app?.locals?.sessions[req.query?.session];
+    if (currentSession?.currentHost?.[0] === req.query?.user && req.query?.reset === "true") {
+        // currentSession.currentHost = [];
+        currentSession.currentVoters = new Set();
+        currentSession.score.serverThumbsDown = 0;
+        currentSession.score.serverThumbsUp = 0;
     }
+
+    console.log("app.locals.score", app.locals.score)
+    console.log("app.locals.currentVoters", app.locals.currentVoters)
+    console.log("app.locals.currentHost", app.locals.currentHost)
+    console.log("thumbs up", +req.query?.thumbsUp)
+    console.log("thumbs down", +req.query?.thumbsDown)
+    console.log("user", req.query?.user)
+    console.log('session', req.query.session)
+    console.log('session', app.locals.sessions)
 
     res.send(req.query.reset)
 })

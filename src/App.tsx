@@ -2,64 +2,81 @@ import {useEffect, useState} from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import {useHref, useNavigate} from "react-router-dom";
 
-function uuidv4() {
-    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
-        (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
-    );
+const uuidv4 = () => {
+    const makeGuid = () => {
+        const guid = "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+            (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16)
+        );
+        return guid
+    }
+    return makeGuid;
 }
+
+const parentUrl = 'http://localhost:8000';
 
 function App() {
     const [thumbsDown, setThumbsDown] = useState(0);
     const [thumbsUp, setThumbsUp] = useState(0);
     const [overallThumbsDown, setOverallThumbsDown] = useState(0);
     const [overallThumbsUp, setOverallThumbsUp] = useState(0);
-    const [guid] = useState(uuidv4());
-
+    const [guid, setGuid] = useState('');
+    const [session, setSession] = useState('');
+    const navigateFunction = useNavigate();
     useEffect(() => {
-        fetch(`/api/participant/?thumbsUp=${thumbsUp}&thumbsDown=${thumbsDown}&user=${guid}`,
-            {method: "GET"}).then(x => x.json())
-            .then(({serverThumbsUp, serverThumbsDown}) => {
-                console.log(serverThumbsUp)
-                setOverallThumbsDown(serverThumbsDown);
-                setOverallThumbsUp(serverThumbsUp);
-            })
+        if (session === '') {
+            const queryParams = new URLSearchParams(window.location.search)
+            const userSession = queryParams.get("session")
+            if (!userSession) {
+                navigateFunction(`/?session=${uuidv4()()}`)
+            }
+        }
+        if (guid === '') {
+            setGuid(uuidv4()())
+        }
+        const queryParams = new URLSearchParams(window.location.search)
+        const userSession = queryParams.get("session")
+        if (userSession?.length) {
+            setSession(userSession)
+        }
+    }, [session, guid])
+    // const queryParams = new URLSearchParams(window.location.search)
+    // const term = queryParams.get("user")
+    // console.log(term) //pizza
+    useEffect(() => {
+        if (thumbsDown + thumbsUp > 0) {
+            fetch(`${parentUrl}/api/participant/?thumbsUp=${thumbsUp}&thumbsDown=${thumbsDown}&user=${guid}&session=${session}`,
+                {method: "GET"}).then(x => x.json())
+                .then(({serverThumbsUp, serverThumbsDown}) => {
+                    setOverallThumbsDown(serverThumbsDown);
+                    setOverallThumbsUp(serverThumbsUp);
+                })
+        }
     }, [thumbsUp, thumbsDown])
 
-    const onClickHandler = () => {
+    const onRefreshClickHandler = () => {
 
-        fetch(`/api/participant/?thumbsUp=${0}&thumbsDown=${0}&user=${guid}`,
+        fetch(`${parentUrl}/api/participant/?thumbsUp=${0}&thumbsDown=${0}&user=${guid}&session=${session}`,
             {method: "GET"}).then(x => x.json())
             .then(({serverThumbsUp, serverThumbsDown}) => {
-                console.log(serverThumbsUp)
                 setOverallThumbsDown(serverThumbsDown);
                 setOverallThumbsUp(serverThumbsUp);
             })
     }
-    const onAdminStartClickHandler = async () => {
-
-        fetch(`/api/admin/?user=${guid}`,
-            {method: "GET"}).then(x => x.text())
-            .then(console.log)
-    }
     const onAdminResetClickHandler = () => {
-
-        fetch(`/api/admin/?user=${guid}&reset=true`,
+        fetch(`${parentUrl}/api/admin/?user=${guid}&reset=true&session=${session}`,
             {method: "GET"}).then(x => x.text())
-            .then(() => onClickHandler())
+            .then(() => {
+                setThumbsUp(0);
+                setThumbsDown(0);
+                onRefreshClickHandler();
+            })
     }
 
     return (
         <>
-            <div>
-                <a href="https://vitejs.dev" target="_blank">
-                    <img src={viteLogo} className="logo" alt="Vite logo"/>
-                </a>
-                <a href="https://react.dev" target="_blank">
-                    <img src={reactLogo} className="logo react" alt="React logo"/>
-                </a>
-            </div>
-            <h1>Vite + React</h1>
+            <h1>Sprint Retro Thumbs Up Or Down</h1>
             <div className="card">
                 <button onClick={() => {
                     setThumbsUp(1);
@@ -73,12 +90,9 @@ function App() {
                 }}>
                     Thumbs Down +{thumbsDown}
                 </button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
             </div>
             <div className="card">
-                <button onClick={onClickHandler}>Refresh Score</button>
+                <button onClick={onRefreshClickHandler}>Refresh Score</button>
                 <div>
                     Overall Thumbs Up +{overallThumbsUp}
                 </div>
@@ -88,12 +102,8 @@ function App() {
                 <p>
                     Edit <code>src/App.tsx</code> and save to test HMR
                 </p>
-                <button onClick={onAdminStartClickHandler}>Start Scoring</button>
                 <button onClick={onAdminResetClickHandler}>Reset Score</button>
             </div>
-            <p className="read-the-docs">
-                Click on the Vite and React logos to learn more
-            </p>
         </>
     )
 }
