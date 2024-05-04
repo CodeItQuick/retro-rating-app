@@ -12,7 +12,7 @@ const uuidv4 = () => {
     return makeGuid;
 }
 
-const parentUrl = 'http://localhost:8000';
+const parentUrl = '';
 
 function App() {
     const [thumbsDown, setThumbsDown] = useState(0);
