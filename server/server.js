@@ -21,7 +21,7 @@ app.locals.currentHost = [];
 app.locals.sessions = { }
 
 // respond with "hello world" when a GET request is made to the homepage
-router.get('/api/participant', (req, res) => {
+router.get('/participant', (req, res) => {
     // start
     if (!app?.locals?.sessions?.[req.query?.session]) {
         app.locals.sessions = {
@@ -52,7 +52,7 @@ router.get('/api/participant', (req, res) => {
     console.log('session', currentSession)
     res.send(currentSession.score)
 })
-router.get('/api/admin', (req, res) => {
+router.get('/admin', (req, res) => {
     // start
     if (!app?.locals?.sessions?.[req.query?.session]) {
         app.locals.sessions = {
