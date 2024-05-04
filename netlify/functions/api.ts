@@ -66,5 +66,5 @@ router.get('/admin', (req, res) => {
     res.send(req.query.reset)
 })
 
-app.use("/app/", router);
+app.use("/api/", router);
 export const handler = serverless(app);
