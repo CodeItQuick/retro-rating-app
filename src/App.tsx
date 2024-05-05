@@ -83,11 +83,13 @@ function App() {
     }
     const onAdminResetClickHandler = () => {
         fetch(`${parentUrl}/api/admin/?user=${guid}&reset=true&session=${session}`,
-            {method: "GET"}).then(x => x.text())
-            .then(() => {
-                setThumbsUp(0);
-                setThumbsDown(0);
-                setPoopEmoji(0)
+            {method: "GET"}).then(x => x.json())
+            .then(({serverThumbsUp, serverThumbsDown, serverPoopEmoji}) => {
+                if (serverPoopEmoji + serverThumbsDown + serverThumbsUp === 0) {
+                    setThumbsDown(0);
+                    setThumbsUp(0);
+                    setPoopEmoji(0);
+                }
                 onRefreshClickHandler();
             })
     }

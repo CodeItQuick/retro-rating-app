@@ -85,7 +85,7 @@ function adminEndpoint() {
         console.log('session', req.query.session)
         console.log('session', app.locals.sessions)
 
-        res.send(req.query.reset)
+        res.send(currentSession.score)
     };
 }
 
