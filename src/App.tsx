@@ -126,7 +126,7 @@ function App() {
                         onVoteHandler({ poopEmojiParam: 0, thumbsDownParam: 1, thumbsUpParam: 0 });
                     }
                 }}>
-                    🐵🐵 +{thumbsDown}
+                    😥😥😥😥 +{thumbsDown}
                 </button>
                 <button onClick={() => {
                     if (poopEmoji + thumbsUp + thumbsDown === 0) {
@@ -145,7 +145,7 @@ function App() {
                     Overall 🚀👩‍🚀👨‍🚀 +{overallThumbsUp}
                 </div>
                 <div>
-                    Overall 🐵🐵 +{overallThumbsDown}
+                    Overall 😥😥😥😥 +{overallThumbsDown}
                 </div>
                 <div>
                     Overall 💩💩 +{overallPoopEmoji}
