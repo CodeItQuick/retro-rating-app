@@ -1,3 +1,11 @@
+# Rate Your Retro
+
+Made with the vite template, this website attempts to let you rate your last sprint during the retrospective
+with three emoji choices. I may add more functionality later, or I may not, will depend on if it gets used.
+
+In terms of development these architecture choices/no testing made it a huge pain. I spent a very large amount
+of time fixing bugs over and above what I'm used too.
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
