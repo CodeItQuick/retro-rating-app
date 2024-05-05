@@ -100,7 +100,7 @@ function App() {
 
     return (
         <>
-            <h1>Sprint Thumbs Up Or Down</h1>
+            <h1>Previous Sprint Rating Tool - For The Retro</h1>
             <div className="card">
                 <div>
                     <label>Name: </label>
