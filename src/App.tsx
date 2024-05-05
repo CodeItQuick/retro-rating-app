@@ -82,7 +82,10 @@ function App() {
         <>
             <h1>Sprint Thumbs Up Or Down</h1>
             <div className="card">
-                <input type={"text"} onChange={onUsernameChangeHandler}  />
+                <div>
+                    <label>Name: </label>
+                    <input type={"text"} onChange={onUsernameChangeHandler}  />
+                </div>
                 <button onClick={() => {
                     setThumbsUp(1);
                     setThumbsDown(0);
