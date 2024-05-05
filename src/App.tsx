@@ -19,8 +19,10 @@ const parentUrl = import.meta?.env?.VITE_HTTP_PREFIX?.length > 0
 function App() {
     const [thumbsDown, setThumbsDown] = useState(0);
     const [thumbsUp, setThumbsUp] = useState(0);
+    const [poopEmoji, setPoopEmoji] = useState(0);
     const [overallThumbsDown, setOverallThumbsDown] = useState(0);
     const [overallThumbsUp, setOverallThumbsUp] = useState(0);
+    const [overallPoopEmoji, setOverallPoopEmoji] = useState(0);
     const [guid, setGuid] = useState('');
     const [session, setSession] = useState('');
     const navigateFunction = useNavigate();
@@ -45,23 +47,26 @@ function App() {
     // const term = queryParams.get("user")
     // console.log(term) //pizza
     useEffect(() => {
-        if (thumbsDown + thumbsUp > 0) {
-            fetch(`${parentUrl}/api/participant/?thumbsUp=${thumbsUp}&thumbsDown=${thumbsDown}&user=${guid}&session=${session}`,
+        if (thumbsDown + thumbsUp + poopEmoji > 0) {
+            fetch(`${parentUrl}/api/participant/?thumbsUp=${thumbsUp}&` +
+                `thumbsDown=${thumbsDown}&poopEmoji=${poopEmoji}&user=${guid}&session=${session}`,
                 {method: "GET"}).then(x => x.json())
-                .then(({serverThumbsUp, serverThumbsDown}) => {
+                .then(({serverThumbsUp, serverThumbsDown, serverPoopEmoji}) => {
                     setOverallThumbsDown(serverThumbsDown);
                     setOverallThumbsUp(serverThumbsUp);
+                    setOverallPoopEmoji(serverPoopEmoji);
                 })
         }
-    }, [thumbsUp, thumbsDown])
+    }, [thumbsUp, thumbsDown, poopEmoji])
 
     const onRefreshClickHandler = () => {
 
         fetch(`${parentUrl}/api/participant/?thumbsUp=${0}&thumbsDown=${0}&user=${guid}&session=${session}`,
             {method: "GET"}).then(x => x.json())
-            .then(({serverThumbsUp, serverThumbsDown}) => {
+            .then(({serverThumbsUp, serverThumbsDown, serverPoopEmoji}) => {
                 setOverallThumbsDown(serverThumbsDown);
                 setOverallThumbsUp(serverThumbsUp);
+                setOverallPoopEmoji(serverPoopEmoji);
             })
     }
     const onAdminResetClickHandler = () => {
@@ -70,6 +75,7 @@ function App() {
             .then(() => {
                 setThumbsUp(0);
                 setThumbsDown(0);
+                setPoopEmoji(0)
                 onRefreshClickHandler();
             })
     }
@@ -86,19 +92,35 @@ function App() {
             <div className="card">
                 <div>
                     <label>Name: </label>
-                    <input type={"text"} onChange={onUsernameChangeHandler}  />
+                    <input type={"text"} onChange={onUsernameChangeHandler}/>
                 </div>
+                <div>Choose Carefully! Only one push allowed!</div>
                 <button onClick={() => {
-                    setThumbsUp(1);
-                    setThumbsDown(0);
+                    if (poopEmoji + thumbsUp + thumbsDown === 0) {
+                        setPoopEmoji(0);
+                        setThumbsUp(1);
+                        setThumbsDown(0);
+                    }
                 }}>
                     Thumbs Up +{thumbsUp}
                 </button>
                 <button onClick={() => {
-                    setThumbsUp(0);
-                    setThumbsDown(1);
+                    if (poopEmoji + thumbsUp + thumbsDown === 0) {
+                        setPoopEmoji(0);
+                        setThumbsUp(0);
+                        setThumbsDown(1);
+                    }
                 }}>
                     Thumbs Down +{thumbsDown}
+                </button>
+                <button onClick={() => {
+                    if (poopEmoji + thumbsUp + thumbsDown === 0) {
+                        setPoopEmoji(1);
+                        setThumbsUp(0);
+                        setThumbsDown(0);
+                    }
+                }}>
+                    💩💩 +{poopEmoji}
                 </button>
             </div>
             <div className="card">
@@ -108,6 +130,9 @@ function App() {
                 </div>
                 <div>
                     Overall Thumbs Down +{overallThumbsDown}
+                </div>
+                <div>
+                    Overall 💩💩 +{overallPoopEmoji}
                 </div>
                 <button onClick={onAdminResetClickHandler}>Reset Score</button>
             </div>

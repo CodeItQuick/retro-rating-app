@@ -9,7 +9,7 @@ app.use(cors());
 
 // app.use(cors(corsOptions))
 // copy pasta below
-app.locals.score = {serverThumbsUp: 0, serverThumbsDown: 0};
+app.locals.score = {serverThumbsUp: 0, serverThumbsDown: 0, serverPoopEmoji: 0};
 app.locals.currentVoters = new Set();
 app.locals.currentHost = [];
 
@@ -22,25 +22,23 @@ function participantEndpoint() {
             app.locals.sessions = {
                 ...app.locals.sessions,
                 [req.query?.session]: {
-                    score: {serverThumbsDown: 0, serverThumbsUp: 0},
+                    score: {serverThumbsDown: 0, serverThumbsUp: 0, serverPoopEmoji: 0},
                     currentVoters: new Set(),
                     currentHost: [req.query?.user]
                 }
             };
         }
         const currentSession = app?.locals?.sessions[req.query?.session];
-        if (+req.query.thumbsUp === 1 && !currentSession?.currentVoters.has(req.query?.user)) {
+        const attachedUser = currentSession?.currentVoters.has(req.query?.user);
+        if (+req.query.thumbsUp === 1 && !attachedUser && currentSession.user !== req.query?.user) {
             currentSession.score.serverThumbsUp++;
             currentSession.currentVoters.add(req.query?.user)
-        } else if (+req.query.thumbsDown === 1 && !currentSession?.currentVoters.has(req.query?.user)) {
+        } else if (+req.query.poopEmoji === 1 && !attachedUser && currentSession.user !== req.query?.user) {
+            currentSession.score.serverPoopEmoji++;
+            currentSession.currentVoters.add(req.query?.user)
+        } else if (+req.query.thumbsDown === 1 && !attachedUser && currentSession.user !== req.query?.user) {
             currentSession.score.serverThumbsDown++;
             currentSession.currentVoters.add(req.query?.user)
-        } else if (+req.query.thumbsUp === 1 && currentSession?.currentVoters.has(req.query?.user)) {
-            currentSession.score.serverThumbsUp++;
-            currentSession.score.serverThumbsDown--;
-        } else if (+req.query.thumbsDown === 1 && currentSession?.currentVoters.has(req.query?.user)) {
-            currentSession.score.serverThumbsDown++;
-            currentSession.score.serverThumbsUp--;
         }
         console.log("app.locals.score", app.locals.score)
         console.log("app.locals.currentVoters", app.locals.currentVoters)
@@ -61,7 +59,7 @@ function adminEndpoint() {
             app.locals.sessions = {
                 ...app.locals.sessions,
                 [req.query?.session]: {
-                    score: {serverThumbsDown: 0, serverThumbsUp: 0},
+                    score: {serverThumbsDown: 0, serverThumbsUp: 0, serverPoopEmoji: 0},
                     currentVoters: new Set(),
                     currentHost: [req.query?.user]
                 }
@@ -73,6 +71,7 @@ function adminEndpoint() {
             currentSession.currentVoters = new Set();
             currentSession.score.serverThumbsDown = 0;
             currentSession.score.serverThumbsUp = 0;
+            currentSession.score.serverPoopEmoji = 0;
         }
 
         console.log("app.locals.score", app.locals.score)
@@ -92,4 +91,4 @@ function adminEndpoint() {
 app.get("/api/participant", participantEndpoint());
 app.get('/api/admin', adminEndpoint())
 
-app.listen(8000)
+app.listen(8000);
