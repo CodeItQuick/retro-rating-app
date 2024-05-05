@@ -27,27 +27,19 @@ function App() {
     const [session, setSession] = useState('');
     const navigateFunction = useNavigate();
     useEffect(() => {
-        if (session === '') {
-            const queryParams = new URLSearchParams(window.location.search)
-            const userSession = queryParams.get("session")
-            if (!userSession) {
-                navigateFunction(`/?session=${uuidv4()()}`)
-            }
-        }
-        if (guid === '') {
-            setGuid(uuidv4()())
-        }
         const queryParams = new URLSearchParams(window.location.search)
         const userSession = queryParams.get("session")
-        if (userSession?.length) {
+        if (userSession?.length > 0) {
             setSession(userSession)
         }
-    }, [session, guid])
-    // const queryParams = new URLSearchParams(window.location.search)
-    // const term = queryParams.get("user")
-    // console.log(term) //pizza
-    useEffect(() => {
-        if (thumbsDown + thumbsUp + poopEmoji > 0) {
+    }, [session])
+    const onCreateSessionHandler = () => {
+        const queryParams = new URLSearchParams(window.location.search)
+        const userSession = queryParams.get("session")
+        if (session === '' && (userSession?.length === undefined || userSession?.length === 0)) {
+            const currentSession = uuidv4()();
+            setSession(currentSession)
+            navigateFunction(`/?session=${currentSession}`)
             fetch(`${parentUrl}/api/participant/?thumbsUp=${thumbsUp}&` +
                 `thumbsDown=${thumbsDown}&poopEmoji=${poopEmoji}&user=${guid}&session=${session}`,
                 {method: "GET"}).then(x => x.json())
@@ -57,16 +49,36 @@ function App() {
                     setOverallPoopEmoji(serverPoopEmoji);
                 })
         }
-    }, [thumbsUp, thumbsDown, poopEmoji])
+    }
+    // const queryParams = new URLSearchParams(window.location.search)
+    // const term = queryParams.get("user")
+    // console.log(term) //pizza
+    const onVoteHandler = (event: { poopEmojiParam: number; thumbsUpParam: number; thumbsDownParam: number }) => {
+        if (thumbsDown + thumbsUp + poopEmoji === 0) {
+            fetch(`${parentUrl}/api/participant/?thumbsUp=${event.thumbsUpParam}&` +
+                `thumbsDown=${event.thumbsDownParam}&poopEmoji=${event.poopEmojiParam}&user=${guid}&session=${session}`,
+                {method: "GET"}).then(x => x.json())
+                .then(({serverThumbsUp, serverThumbsDown, serverPoopEmoji}) => {
+                    setOverallThumbsUp(serverThumbsUp);
+                    setOverallThumbsDown(serverThumbsDown);
+                    setOverallPoopEmoji(serverPoopEmoji);
+                })
+        }
+    }
 
     const onRefreshClickHandler = () => {
-
         fetch(`${parentUrl}/api/participant/?thumbsUp=${0}&thumbsDown=${0}&user=${guid}&session=${session}`,
             {method: "GET"}).then(x => x.json())
             .then(({serverThumbsUp, serverThumbsDown, serverPoopEmoji}) => {
                 setOverallThumbsDown(serverThumbsDown);
                 setOverallThumbsUp(serverThumbsUp);
                 setOverallPoopEmoji(serverPoopEmoji);
+                // bug here, what if you reset and then someone else votes
+                if (serverPoopEmoji + serverThumbsDown + serverThumbsUp === 0) {
+                    setThumbsDown(0);
+                    setThumbsUp(0);
+                    setPoopEmoji(0);
+                }
             })
     }
     const onAdminResetClickHandler = () => {
@@ -93,13 +105,15 @@ function App() {
                 <div>
                     <label>Name: </label>
                     <input type={"text"} onChange={onUsernameChangeHandler}/>
+                    <button onClick={onCreateSessionHandler}>Create Session</button>
                 </div>
                 <div>Choose Carefully! Only one push allowed!</div>
                 <button onClick={() => {
                     if (poopEmoji + thumbsUp + thumbsDown === 0) {
                         setPoopEmoji(0);
-                        setThumbsUp(1);
                         setThumbsDown(0);
+                        setThumbsUp(1);
+                        onVoteHandler({ poopEmojiParam: 0, thumbsDownParam: 0, thumbsUpParam: 1 });
                     }
                 }}>
                     🚀👩‍🚀👨‍🚀 +{thumbsUp}
@@ -107,8 +121,9 @@ function App() {
                 <button onClick={() => {
                     if (poopEmoji + thumbsUp + thumbsDown === 0) {
                         setPoopEmoji(0);
-                        setThumbsUp(0);
                         setThumbsDown(1);
+                        setThumbsUp(0);
+                        onVoteHandler({ poopEmojiParam: 0, thumbsDownParam: 1, thumbsUpParam: 0 });
                     }
                 }}>
                     🐵🐵 +{thumbsDown}
@@ -118,6 +133,7 @@ function App() {
                         setPoopEmoji(1);
                         setThumbsUp(0);
                         setThumbsDown(0);
+                        onVoteHandler({ poopEmojiParam: 1, thumbsDownParam: 0, thumbsUpParam: 0 });
                     }
                 }}>
                     💩💩 +{poopEmoji}
