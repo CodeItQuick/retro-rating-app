@@ -74,7 +74,7 @@ function App() {
 
     return (
         <>
-            <h1>Sprint Retro Thumbs Up Or Down</h1>
+            <h1>Sprint Thumbs Up Or Down</h1>
             <div className="card">
                 <button onClick={() => {
                     setThumbsUp(1);
