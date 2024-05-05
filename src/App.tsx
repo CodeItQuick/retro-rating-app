@@ -102,7 +102,7 @@ function App() {
                         setThumbsDown(0);
                     }
                 }}>
-                    Thumbs Up +{thumbsUp}
+                    🚀👩‍🚀👨‍🚀 +{thumbsUp}
                 </button>
                 <button onClick={() => {
                     if (poopEmoji + thumbsUp + thumbsDown === 0) {
@@ -111,7 +111,7 @@ function App() {
                         setThumbsDown(1);
                     }
                 }}>
-                    Thumbs Down +{thumbsDown}
+                    🐵🐵 +{thumbsDown}
                 </button>
                 <button onClick={() => {
                     if (poopEmoji + thumbsUp + thumbsDown === 0) {
@@ -126,10 +126,10 @@ function App() {
             <div className="card">
                 <button onClick={onRefreshClickHandler}>Refresh Score</button>
                 <div>
-                    Overall Thumbs Up +{overallThumbsUp}
+                    Overall 🚀👩‍🚀👨‍🚀 +{overallThumbsUp}
                 </div>
                 <div>
-                    Overall Thumbs Down +{overallThumbsDown}
+                    Overall 🐵🐵 +{overallThumbsDown}
                 </div>
                 <div>
                     Overall 💩💩 +{overallPoopEmoji}
