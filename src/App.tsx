@@ -80,7 +80,7 @@ function App() {
             })
     }
     const onUsernameChangeHandler = (event: unknown) => {
-        const username = event?.target?.value as string;
+        const username = (event as { target: { value: string }})?.target?.value as string;
         if (username) {
             setGuid(username)
         }
