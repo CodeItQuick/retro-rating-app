@@ -71,11 +71,18 @@ function App() {
                 onRefreshClickHandler();
             })
     }
+    const onUsernameChangeHandler = (event) => {
+        const username = event?.target?.value;
+        if (username) {
+            setGuid(username)
+        }
+    }
 
     return (
         <>
             <h1>Sprint Thumbs Up Or Down</h1>
             <div className="card">
+                <input type={"text"} onChange={onUsernameChangeHandler}  />
                 <button onClick={() => {
                     setThumbsUp(1);
                     setThumbsDown(0);
