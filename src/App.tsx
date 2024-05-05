@@ -71,8 +71,8 @@ function App() {
                 onRefreshClickHandler();
             })
     }
-    const onUsernameChangeHandler = (event) => {
-        const username = event?.target?.value;
+    const onUsernameChangeHandler = (event: unknown) => {
+        const username = event?.target?.value as string;
         if (username) {
             setGuid(username)
         }
