@@ -29,8 +29,8 @@ function App() {
     useEffect(() => {
         const queryParams = new URLSearchParams(window.location.search)
         const userSession = queryParams.get("session")
-        if (userSession?.length > 0) {
-            setSession(userSession)
+        if (userSession?.length !== undefined && userSession?.length > 0) {
+            setSession(userSession as string)
         }
     }, [session])
     const onCreateSessionHandler = () => {
