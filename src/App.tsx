@@ -12,7 +12,9 @@ const uuidv4 = () => {
     return makeGuid;
 }
 
-const parentUrl = '';
+const parentUrl = import.meta?.env?.VITE_HTTP_PREFIX?.length > 0
+    ? import.meta.env.VITE_HTTP_PREFIX :
+    '';
 
 function App() {
     const [thumbsDown, setThumbsDown] = useState(0);
